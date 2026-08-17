@@ -1,0 +1,78 @@
+# Prompt Ablation 3 — rank-8, anatomical context prompt, LAScarQS 2022
+# Prompt: "Segment the LA, a posterior cardiac chamber in MRI"
+# All other settings identical to best rank-8 run
+
+model:
+  name: "facebook/sam3"
+  cache_dir: null
+
+lora:
+  rank: 8
+  alpha: 16
+  dropout: 0.2
+
+  target_modules:
+    - "q_proj"
+    - "k_proj"
+    - "v_proj"
+    - "out_proj"
+    - "qkv"
+    - "proj"
+    - "fc1"
+    - "fc2"
+    - "c_fc"
+    - "c_proj"
+    - "linear1"
+    - "linear2"
+
+  apply_to_vision_encoder: true
+  apply_to_text_encoder: true
+  apply_to_geometry_encoder: true
+  apply_to_detr_encoder: true
+  apply_to_detr_decoder: true
+  apply_to_mask_decoder: true
+
+training:
+  data_dir: "./data_v2"
+  query_text_map:
+    "left atrium": "Segment the LA, a posterior cardiac chamber in MRI"
+  batch_size: 2
+  num_workers: 2
+
+  learning_rate: 5e-6
+  weight_decay: 0.1
+  adam_beta1: 0.9
+  adam_beta2: 0.999
+  adam_epsilon: 1e-8
+  max_grad_norm: 1.0
+
+  num_epochs: 10
+  early_stopping_patience: 10
+  warmup_steps: 500
+  lr_scheduler: "cosine"
+
+  logging_steps: 10
+  eval_steps: 100
+  save_steps: 100
+  save_total_limit: 5
+
+  mixed_precision: "bf16"
+  seed: 42
+  gradient_accumulation_steps: 8
+
+output:
+  output_dir: "outputs/prompt_ablation_3_2022"
+  logging_dir: "logs"
+  save_lora_only: true
+  push_to_hub: false
+  hub_model_id: null
+
+evaluation:
+  metric: "iou"
+  save_predictions: false
+  compute_metrics_during_training: true
+
+hardware:
+  device: "cuda"
+  dataloader_pin_memory: true
+  use_compile: false

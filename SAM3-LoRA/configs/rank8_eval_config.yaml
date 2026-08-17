@@ -1,0 +1,40 @@
+# Eval config matching best_lora_weights.pt (trained with rank=8, frozen vision encoder)
+# Use this for visualize_predictions.py and validate_sam3_lora.py with the old weights
+
+model:
+  name: "facebook/sam3"
+  cache_dir: null
+
+lora:
+  rank: 8
+  alpha: 16
+  dropout: 0.1
+
+  target_modules:
+    - "q_proj"
+    - "k_proj"
+    - "v_proj"
+    - "out_proj"
+    - "qkv"
+    - "proj"
+    - "fc1"
+    - "fc2"
+    - "c_fc"
+    - "c_proj"
+    - "linear1"
+    - "linear2"
+
+  apply_to_vision_encoder: true
+  apply_to_text_encoder: true
+  apply_to_geometry_encoder: true
+  apply_to_detr_encoder: true
+  apply_to_detr_decoder: true
+  apply_to_mask_decoder: true
+
+training:
+  data_dir: "./data"
+  batch_size: 4
+  num_workers: 2
+  learning_rate: 5e-5
+  weight_decay: 0.01
+  num_epochs: 50
